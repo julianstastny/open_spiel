@@ -52,7 +52,7 @@ from open_spiel.python.algorithms.psro_v2 import strategy_selectors
 FLAGS = flags.FLAGS
 
 # Game-related
-flags.DEFINE_string("game_name", "kuhn_poker", "Game name.")
+flags.DEFINE_string("game_name", "blotto", "Game name.")
 flags.DEFINE_integer("n_players", 2, "The number of players.")
 
 # PSRO related
@@ -66,7 +66,7 @@ flags.DEFINE_integer("sims_per_entry", 1000,
 
 flags.DEFINE_integer("gpsro_iterations", 100,
                      "Number of training steps for GPSRO.")
-flags.DEFINE_bool("symmetric_game", False, "Whether to consider the current "
+flags.DEFINE_bool("symmetric_game", True, "Whether to consider the current "
                   "game as a symmetric game.")
 
 # Rectify options
@@ -86,7 +86,7 @@ flags.DEFINE_string("training_strategy_selector", "probabilistic",
                     "probability strategy available to each player.")
 
 # General (RL) agent parameters
-flags.DEFINE_string("oracle_type", "BR", "Choices are DQN, PG (Policy "
+flags.DEFINE_string("oracle_type", "DQN", "Choices are DQN, PG (Policy "
                     "Gradient) or BR (exact Best Response)")
 flags.DEFINE_integer("number_training_episodes", int(1e4), "Number training "
                      "episodes per RL policy. Used for PG and DQN")
