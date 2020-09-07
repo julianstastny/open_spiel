@@ -235,7 +235,7 @@ class DQN(rl_agent.AbstractAgent):
     # Act step: don't act at terminal info states or if its not our turn.
     if (not time_step.last()) and (
         time_step.is_simultaneous_move() or
-        self.player_id == time_step.current_player()):
+        self.player_id == time_step.current_player()) or time_step.current_player() >= 0:
       info_state = time_step.observations["info_state"][self.player_id]
       legal_actions = time_step.observations["legal_actions"][self.player_id]
       epsilon = self._get_epsilon(is_evaluation)
