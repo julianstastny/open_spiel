@@ -179,9 +179,15 @@ class PolicyGradient(rl_agent.AbstractAgent):
 
     # Network
     # activate final as we plug logit and qvalue heads afterwards.
-    self._net_torso = simple_nets.MLPTorso(info_state_size, self._layer_sizes)
-    torso_out = self._net_torso(self._info_state_ph)
-    torso_out_size = self._layer_sizes[-1]
+    if hidden_layers_sizes:
+      self._net_torso = simple_nets.MLPTorso(info_state_size, self._layer_sizes)
+      torso_out = self._net_torso(self._info_state_ph)
+      torso_out_size = self._layer_sizes[-1]
+    else:
+      self._net_torso = simple_nets.Identity(dummy_variable=True)
+      torso_out = self._info_state_ph
+      torso_out_size = info_state_size
+
     self._policy_logits_layer = simple_nets.Linear(
         torso_out_size,
         self._num_actions,
@@ -190,7 +196,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
     # Do not remove policy_logits_network. Even if it's not used directly here,
     # other code outside this file refers to it.
     self.policy_logits_network = simple_nets.Sequential(
-        [self._net_torso, self._policy_logits_layer])
+        [self._net_torso, self._policy_logits_layer]) if hidden_layers_sizes else self._policy_logits_layer
+
     self._policy_logits = self._policy_logits_layer(torso_out)
     self._policy_probs = tf.nn.softmax(self._policy_logits)
 

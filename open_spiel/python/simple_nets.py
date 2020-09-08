@@ -23,6 +23,14 @@ tf.disable_v2_behavior()
 # This code is based directly on the TF docs:
 # https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/Module
 
+class Identity(tf.Module):
+  def __init__(self, name=None, dummy_variable=False):
+    super(Identity, self).__init__(name=name)
+    if dummy_variable:
+      self.dummy_variable = tf.Variable(tf.zeros([1]), name="dummy")
+  def __call__(self, input):
+    return input
+
 
 class Linear(tf.Module):
   """A simple linear module.
