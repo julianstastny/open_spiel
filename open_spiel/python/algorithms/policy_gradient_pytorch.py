@@ -210,6 +210,8 @@ class PolicyGradient(rl_agent.AbstractAgent):
     # Keep track of the last training loss achieved in an update step.
     self._last_loss_value = None
 
+    self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     # Placeholders
     # self._info_state_ph = tf.placeholder(
     #     shape=[None, info_state_size], dtype=tf.float32, name="info_state_ph")
@@ -251,6 +253,9 @@ class PolicyGradient(rl_agent.AbstractAgent):
       #     activate_relu=False,
       #     name="q_values_head")
       # self._q_values = self._q_values_layer(torso_out)
+
+    self.policy_logits_network.to(self.device)
+    self.critic_optimizer.to(self.device)
 
     self._parameters = {
       "_net_torso": self._net_torso,
@@ -431,7 +436,7 @@ class PolicyGradient(rl_agent.AbstractAgent):
     self._episode_data = []
 
   def get_data_tensor(self, name):
-    return torch.Tensor(self._dataset[name])
+    return torch.Tensor(self._dataset[name]).to(self.device)
 
   def _add_transition(self, time_step):
     """Adds intra-episode transition to the `_episode_data` buffer.
