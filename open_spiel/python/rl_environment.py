@@ -208,7 +208,7 @@ class Environment(object):
   def seed(self, seed=None):
     self._chance_event_sampler.seed(seed)
 
-  def get_time_step(self):
+  def get_time_step(self, actions):
     """Returns a `TimeStep` without updating the environment.
 
     Returns:
@@ -225,10 +225,12 @@ class Environment(object):
         "info_state": [],
         "legal_actions": [],
         "current_player": [],
-        "serialized_state": []
+        "serialized_state": [],
+        "last_action": []
     }
     rewards = []
     step_type = StepType.LAST if self._state.is_terminal() else StepType.MID
+
     self._should_reset = step_type == StepType.LAST
 
     cur_rewards = self._state.rewards()
@@ -239,6 +241,8 @@ class Environment(object):
           else self._state.information_state_tensor(player_id))
 
       observations["legal_actions"].append(self._state.legal_actions(player_id))
+      observations["last_action"].append(actions[player_id])
+
     observations["current_player"] = self._state.current_player()
     discounts = self._discounts
     if step_type == StepType.LAST:
@@ -292,7 +296,7 @@ class Environment(object):
       self._state.apply_actions(actions)
     self._sample_external_events()
 
-    return self.get_time_step()
+    return self.get_time_step(actions)
 
   def reset(self):
     """Starts a new sequence and returns the first `TimeStep` of this sequence.
@@ -315,7 +319,9 @@ class Environment(object):
         "info_state": [],
         "legal_actions": [],
         "current_player": [],
-        "serialized_state": []
+        "serialized_state": [],
+        "last_action": []
+
     }
     for player_id in range(self.num_players):
       observations["info_state"].append(
@@ -358,6 +364,7 @@ class Environment(object):
         legal_actions=(self._game.num_distinct_actions(),),
         current_player=(),
         serialized_state=(),
+        last_action=()
     )
 
   def action_spec(self):
